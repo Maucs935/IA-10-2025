@@ -1,9 +1,13 @@
 import pygame
 
+pygame.init()
+icono = pygame.image.load("nucles.png")
+pygame.display.set_icon(icono)
+
 ANCHO_VENTANA = 800
 VENTANA = pygame.display.set_mode((ANCHO_VENTANA, ANCHO_VENTANA))
 
-pygame.display.set_caption("We must fund the way")
+pygame.display.set_caption("We must find da way")
 
 #Definición de colores (RGB)
 BLANCO = (255,255,255)
@@ -16,7 +20,7 @@ AZUL = (0, 255, 255)
 PURPURA = (128,0,128)
 
 pygame.font.init()
-FUENTE = pygame.font.SysFont("Arial", 16)
+FUENTE = pygame.font.SysFont("Arial", 18)
 
 class Nodo:
     def __init__(self, fila, col, ancho, total_filas):
@@ -69,18 +73,33 @@ class Nodo:
         self.color = VERDE
     #!-----------------------------------------------------------------------------
     def dibujar(self, ventana):
-        pygame.draw.rect(ventana, self.color, (self.x, self.y, self.ancho, self.ancho))
-        
+        # Colores más suaves
+        color_map = {
+            BLANCO: (240, 240, 240),
+            NEGRO: (50, 50, 50),
+            GRIS: (180, 180, 180),
+            VERDE: (100, 220, 100),
+            ROJO: (220, 100, 100),
+            NARANJA: (255, 200, 100),
+            AZUL: (100, 200, 255),
+            PURPURA: (180, 100, 220)
+        }
+        color = color_map.get(self.color, self.color)
+        rect = pygame.Rect(self.x, self.y, self.ancho, self.ancho)
+        # Dibuja el fondo con esquinas redondeadas
+        pygame.draw.rect(ventana, color, rect, border_radius=8)
+        # Borde más visible
+        pygame.draw.rect(ventana, (120, 120, 120), rect, width=2, border_radius=8)
+        # Si es camino, resalta el borde
         if self.color == VERDE:
-            pygame.draw.rect(ventana, NEGRO, (self.x, self.y, self.ancho, self.ancho), width=3)
+            pygame.draw.rect(ventana, (30, 180, 30), rect, width=4, border_radius=8)
         elif self.color == GRIS:
-            pygame.draw.rect(ventana, BLANCO, (self.x, self.y, self.ancho, self.ancho), width=3)
-        
+            pygame.draw.rect(ventana, (200, 200, 200), rect, width=4, border_radius=8)
+        # Letras de g, h, f
         if self.color not in [BLANCO, NEGRO]:
             g, h, f = (("0" if x == float("inf") else int(x)) for x in (self.g, self.h, self.f))
-            
-            for i, (label, value) in enumerate(zip("ghf", (g,h,f))):
-                ventana.blit(FUENTE.render(f"{label}: {value}", True, NEGRO), (self.x + 5, self.y + 5 + i * 15))
+            for i, (label, value) in enumerate(zip("ghf", (g, h, f))):
+                ventana.blit(FUENTE.render(f"{label}: {value}", True, (60, 60, 60)), (self.x + 5, self.y + 5 + i * 15))
     #!-----------------------------------------------------------------------------
     def evaluar_v(self, grid, nodos_camino):
         self.vecinos = []
